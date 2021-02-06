@@ -1,7 +1,6 @@
 package com.benefitj.nio;
 
-import com.benefitj.core.HexTools;
-import com.benefitj.core.Utils;
+import com.benefitj.core.HexUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -19,13 +18,15 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class TcpNettyClient {
-  public static void main(String[] args) throws InterruptedException {
+  public static void main(String[] args) throws Exception {
 
-    new Thread(() -> startClient(10)).start();
+    new Thread(() -> startClient(40)).start();
+
+//    TimeUnit.SECONDS.sleep(4);
+//
 //    // 启动第二个客户端
 //    new Thread(() -> startClient(20)).start();
 //
-//    TimeUnit.SECONDS.sleep(30);
 //
 //    System.err.println("启动第三个客户端......");
 //    new Thread(() -> startClient(30)).start();
@@ -69,7 +70,7 @@ public class TcpNettyClient {
                   protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
                     byte[] dest = new byte[msg.readableBytes()];
                     msg.readBytes(dest);
-                    logger.info("receive msg: \"" + new String(dest) + "\", dest: " + HexTools.byteToHex(dest));
+                    logger.info("receive msg: \"" + new String(dest) + "\", dest: " + HexUtils.bytesToHex(dest));
                   }
                 });
           }
@@ -95,9 +96,11 @@ public class TcpNettyClient {
 
       logger.info("5秒后停止客户端");
 
-      channel.writeAndFlush("5秒后停止客户端");
+      channel.writeAndFlush("after 5s to terminal !");
 
-      Utils.sleep(5, TimeUnit.SECONDS);
+      try {
+        TimeUnit.SECONDS.sleep(5);
+      } catch (InterruptedException e) {}
 
       // 关闭客户端
       channel.close();
